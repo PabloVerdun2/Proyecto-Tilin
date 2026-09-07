@@ -1,87 +1,55 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú del Restaurante</title>
-    <link rel="stylesheet" href="menu.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-    <header class="hero">
+{% extends 'cuentas/base.html' %}
+{% load static %}
+
+{% block titulo %}Menú del Restaurante{% endblock %}
+
+{% block estilos %}
+    <link rel="stylesheet" href="{% static 'cuentas/menu.css' %}">
+{% endblock %}
+
+{% block contenido %}
+    <section class="hero">
         <div class="hero-content">
             <h1>Nuestro Menú</h1>
             <p>Sabores auténticos, ingredientes frescos</p>
         </div>
-    </header>
+    </section>
 
     <div class="container">
-        <section class="menu-section">
-            <h2 class="section-title">Entradas</h2>
-            <div class="menu-items">
-                <div class="menu-item">
-                    <h3>Mbeju</h3>
-                    <p class="description">Pan tostado con tomates frescos, albahaca y aceite de oliva virgen extra</p>
-                    <p class="price">45.000 gs</p>
-                </div>
-                <div class="menu-item">
-                    <h3>Chipa Guasu</h3>
-                    <p class="description">Finas láminas de res con rúcula, parmesano y alcaparras</p>
-                    <p class="price">50.000 gs</p>
-                </div>
-                <div class="menu-item">
-                    <h3>Sopa Paraguaya</h3>
-                    <p class="description">Atún fresco con aguacate, sésamo y salsa de soja reducida</p>
-                    <p class="price">50.000 gs</p>
-                </div>
+        <div class="panel-filtros">
+            <div class="campo-filtro">
+                <label for="buscar-plato">Buscar plato</label>
+                <input type="text" id="buscar-plato" placeholder="Escribí el nombre de un plato...">
             </div>
-        </section>
+            <div class="campo-filtro">
+                <label for="orden-plato">Ordenar por</label>
+                <select id="orden-plato">
+                    <option value="nombre">Nombre (A-Z)</option>
+                    <option value="precio-asc">Precio: de menor a mayor</option>
+                    <option value="precio-desc">Precio: de mayor a menor</option>
+                </select>
+            </div>
+        </div>
+
+        <p id="resumen-platos"></p>
 
         <section class="menu-section">
-            <h2 class="section-title">Platos Principales</h2>
-            <div class="menu-items">
-                <div class="menu-item">
-                    <h3>Asados</h3>
-                    <p class="description">Arroz arbóreo cremoso con mezcla de hongos silvestres y trufa</p>
-                    <p class="price">130.000 gs</p>
-                </div>
-                <div class="menu-item">
-                    <h3>Vori vori</h3>
-                    <p class="description">Corte premium con puré de papas y vegetales asados</p>
-                    <p class="price">80.000 gs</p>
-                </div>
-                <div class="menu-item">
-                    <h3>Caldo de pescado</h3>
-                    <p class="description">Con costra de hierbas, espárragos y salsa holandesa</p>
-                    <p class="price">150.000 gs</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="menu-section">
-            <h2 class="section-title">Postres</h2>
-            <div class="menu-items">
-                <div class="menu-item">
-                    <h3>Tiramisú Clásico</h3>
-                    <p class="description">Capas de bizcocho de café, mascarpone y cacao</p>
-                    <p class="price">20.000 gs</p>
-                </div>
-                <div class="menu-item">
-                    <h3>Fondant de Chocolate</h3>
-                    <p class="description">Con corazón líquido y helado de vainilla</p>
-                    <p class="price">15.000 gs</p>
-                </div>
-                <div class="menu-item">
-                    <h3>Cheesecake de Frutos Rojos</h3>
-                    <p class="description">Base crujiente con coulis de frambuesa y mora</p>
-                    <p class="price">30.000 gs</p>
-                </div>
+            <div class="menu-items" id="grilla-platos">
+                {% for plato in platos %}
+                    <div class="menu-item"
+                         data-nombre="{{ plato.nombre }}"
+                         data-precio="{{ plato.precio }}">
+                        <h3>{{ plato.nombre }}</h3>
+                        <p class="price">{{ plato.precio_formateado }} gs</p>
+                    </div>
+                {% empty %}
+                    <p class="sin-resultados">Todavía no hay platos cargados en la carta.</p>
+                {% endfor %}
             </div>
         </section>
     </div>
+{% endblock %}
 
-    <footer class="footer">
-        <p>Todos los derechos reservados.</p>
-    </footer>
-</body>
-</html>
+{% block scripts %}
+    <script src="{% static 'cuentas/js/menu.js' %}"></script>
+{% endblock %}

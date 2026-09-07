@@ -1,0 +1,39 @@
+{% extends 'cuentas/base.html' %}
+{% load static %}
+
+{% block titulo %}Mis Reservas - Asunción Gourmet{% endblock %}
+
+{% block contenido %}
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Mis Reservas</h2>
+            <p>Consultá el estado de tus reservaciones</p>
+        </div>
+    </section>
+
+    <section class="reservation-form">
+        <div id="contadores"></div>
+
+        <div class="panel-filtros">
+            <div class="campo-filtro">
+                <label for="filtro-estado">Filtrar por estado</label>
+                <select id="filtro-estado">
+                    <option value="todas">Todas</option>
+                    <option value="pendiente">Pendientes</option>
+                    <option value="confirmada">Confirmadas</option>
+                    <option value="cancelada">Canceladas</option>
+                </select>
+            </div>
+            <div class="campo-filtro">
+                <label for="filtro-texto">Buscar por nombre o correo</label>
+                <input type="text" id="filtro-texto" placeholder="Escribí para filtrar...">
+            </div>
+        </div>
+
+        <div id="lista-reservas"></div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'cuentas/js/reservas-lista.js' %}"></script>
+{% endblock %}

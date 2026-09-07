@@ -1,0 +1,194 @@
+/* ============================================================
+   ESTILOS DEL MVP
+   Formulario validado, listado de reservas y filtros del menu.
+   Se carga despues de style.css y reutiliza su paleta.
+   ============================================================ */
+
+/* ===== VALIDACIONES DEL FORMULARIO ===== */
+.campo-invalido {
+    border: 1px solid #c0392b !important;
+    background-color: #fdf3f2;
+}
+
+.error-campo {
+    display: block;
+    margin-top: 6px;
+    color: #c0392b;
+    font-size: 0.85rem;
+}
+
+.aviso-exito {
+    background-color: #eafaf1;
+    border-left: 4px solid #27ae60;
+    color: #1e6b43;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.aviso-exito a {
+    color: #1e6b43;
+    font-weight: bold;
+}
+
+/* ===== PANEL DE FILTROS ===== */
+.panel-filtros {
+    max-width: 900px;
+    margin: 0 auto 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.panel-filtros .campo-filtro {
+    flex: 1 1 200px;
+}
+
+.panel-filtros label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.panel-filtros input,
+.panel-filtros select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+/* ===== CONTADORES ===== */
+#contadores {
+    max-width: 900px;
+    margin: 0 auto 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.contador {
+    background: #f4f6f7;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.9rem;
+    color: #2c3e50;
+}
+
+.contador-pendiente  { background: #fef5e7; color: #b9770e; }
+.contador-confirmada { background: #eafaf1; color: #1e6b43; }
+.contador-cancelada  { background: #fdf3f2; color: #a5281b; }
+
+/* ===== LISTADO DE RESERVAS ===== */
+#lista-reservas {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    gap: 20px;
+}
+
+.reserva-item {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 22px 25px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #bdc3c7;
+    transition: border-color 0.3s ease;
+}
+
+.reserva-item.estado-pendiente  { border-left-color: #f39c12; }
+.reserva-item.estado-confirmada { border-left-color: #27ae60; }
+.reserva-item.estado-cancelada  { border-left-color: #c0392b; opacity: 0.75; }
+
+.reserva-cabecera {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.reserva-cabecera h3 {
+    color: #2c3e50;
+    font-size: 1.15rem;
+}
+
+.badge {
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.badge-pendiente  { background: #fef5e7; color: #b9770e; }
+.badge-confirmada { background: #eafaf1; color: #1e6b43; }
+.badge-cancelada  { background: #fdf3f2; color: #a5281b; }
+
+.reserva-datos {
+    list-style: none;
+    margin-bottom: 18px;
+}
+
+.reserva-datos li {
+    padding: 3px 0;
+    color: #566573;
+    font-size: 0.95rem;
+}
+
+.reserva-datos strong { color: #2c3e50; }
+
+.reserva-acciones {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-accion {
+    border: none;
+    border-radius: 20px;
+    padding: 8px 18px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.btn-confirmar { background: #27ae60; }
+.btn-confirmar:hover { background: #1e8449; }
+.btn-cancelar  { background: #c0392b; }
+.btn-cancelar:hover  { background: #922b21; }
+.btn-reabrir   { background: #e67e22; }
+.btn-reabrir:hover   { background: #d35400; }
+
+.sin-resultados {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    color: #7f8c8d;
+    padding: 40px 20px;
+    background: #fbfbfb;
+    border-radius: 15px;
+}
+
+/* ===== CONTROLES DEL MENU ===== */
+#resumen-platos {
+    max-width: 1000px;
+    margin: 0 auto 20px;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+    .reserva-cabecera {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

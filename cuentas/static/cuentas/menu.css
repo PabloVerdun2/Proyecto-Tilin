@@ -1,0 +1,72 @@
+/* ===== ESTILOS DE LA PANTALLA DE MENU =====
+   Se carga despues de style.css, que ya aporta navbar, hero y footer. */
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 50px 20px;
+}
+
+.menu-section {
+    margin-bottom: 50px;
+}
+
+.section-title {
+    color: #e67e22;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.menu-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.menu-item {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.menu-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.menu-item h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.menu-item .description {
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.menu-item .price {
+    color: #e67e22;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 30px 15px;
+    }
+
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+}

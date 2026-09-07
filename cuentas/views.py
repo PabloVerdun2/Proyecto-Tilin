@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 
 
 from .forms import RegistroUsuarioForm
+from .models import Comida
 
 # LOGIN
 def login_view(request):
@@ -38,6 +39,21 @@ def register_view(request):
 @login_required
 def index_view(request):
     return render(request, 'cuentas/index.html', {'usuario': request.user.first_name})
+
+# MENU DEL RESTAURANTE (requiere login)
+@login_required
+def menu_view(request):
+    return render(request, 'cuentas/menu.html', {
+        'usuario': request.user.first_name,
+        'platos': Comida.objects.all(),
+    })
+
+# LISTADO DE RESERVAS (requiere login)
+# El listado se arma del lado cliente con datos simulados: en esta etapa
+# del MVP la vista solo entrega la pantalla.
+@login_required
+def reservas_view(request):
+    return render(request, 'cuentas/reservas.html', {'usuario': request.user.first_name})
 
 # LOGOUT
 def logout_view(request):

@@ -21,9 +21,16 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    OPCIONES_ROL = [
+        ('cliente', 'Cliente'),
+        ('recepcionista', 'Recepcionista'),
+        ('admin', 'Administrador'),
+    ]
+
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
+    rol = models.CharField(max_length=20, choices=OPCIONES_ROL, default='cliente')
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -69,6 +76,27 @@ class Reserva(models.Model):
     correo = models.EmailField()
     telefono = models.CharField(max_length=20, blank=True)
     notas_adicionales = models.TextField(blank=True)
+    activa = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Reserva de {self.cliente.email} el {self.fecha} a las {self.hora}"
+
+
+# ==============================
+# MODELO COMIDA
+# ==============================
+class Comida(models.Model):
+    nombre = models.CharField(max_length=100)
+    precio = models.IntegerField(help_text="Precio en guaranies")
+
+    class Meta:
+        verbose_name_plural = "Comidas"
+        ordering = ['nombre']
+
+    @property
+    def precio_formateado(self):
+        """Precio con punto como separador de miles: 50000 -> '50.000'."""
+        return f"{self.precio:,}".replace(",", ".")
+
+    def __str__(self):
+        return f"{self.nombre} - {self.precio_formateado} gs"

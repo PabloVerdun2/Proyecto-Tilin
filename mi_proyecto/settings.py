@@ -90,8 +90,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Configuración regional
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'es'
+TIME_ZONE = 'America/Asuncion'
 USE_I18N = True
 USE_TZ = True
 
