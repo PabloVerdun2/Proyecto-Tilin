@@ -167,6 +167,8 @@
 .btn-cancelar:hover  { background: #922b21; }
 .btn-reabrir   { background: #e67e22; }
 .btn-reabrir:hover   { background: #d35400; }
+.btn-actualizar { background: #2c3e50; padding: 11px 22px; }
+.btn-actualizar:hover { background: #1a252f; }
 
 .sin-resultados {
     max-width: 900px;
@@ -176,6 +178,12 @@
     padding: 40px 20px;
     background: #fbfbfb;
     border-radius: 15px;
+}
+
+/* Mensaje cuando falla la consulta a la API. */
+.sin-resultados.aviso-error {
+    background: #fdf3f2;
+    color: #a5281b;
 }
 
 /* ===== CONTROLES DEL MENU ===== */

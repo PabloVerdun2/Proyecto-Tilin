@@ -28,9 +28,10 @@
                 <label for="filtro-texto">Buscar por nombre o correo</label>
                 <input type="text" id="filtro-texto" placeholder="Escribí para filtrar...">
             </div>
+            <button type="button" id="btn-actualizar" class="btn-accion btn-actualizar">Actualizar</button>
         </div>
 
-        <div id="lista-reservas"></div>
+        <div id="lista-reservas" data-url-api="{% url 'reservas_api' %}"></div>
     </section>
 {% endblock %}
 

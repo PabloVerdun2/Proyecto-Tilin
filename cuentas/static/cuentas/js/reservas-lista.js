@@ -4,6 +4,9 @@
    Interacciones del punto 3.7: mostrar el listado, filtrarlo,
    cambiar el estado de una reserva y actualizar los contadores,
    todo sin recargar la pagina.
+
+   Indicador 3: las reservas se piden a la API con fetch() (GET)
+   y la pantalla muestra los estados de carga, exito y error.
    ============================================================ */
 
 (function () {
@@ -12,9 +15,16 @@
     const contenedor = document.getElementById('lista-reservas');
     if (!contenedor) return;   // Esta pantalla no es la del listado.
 
-    const filtroEstado = document.getElementById('filtro-estado');
-    const filtroTexto  = document.getElementById('filtro-texto');
-    const contadores   = document.getElementById('contadores');
+    const filtroEstado    = document.getElementById('filtro-estado');
+    const filtroTexto     = document.getElementById('filtro-texto');
+    const contadores      = document.getElementById('contadores');
+    const botonActualizar = document.getElementById('btn-actualizar');
+
+    // Endpoint de la API: lo escribe Django en el atributo data-url-api.
+    const URL_API = contenedor.dataset.urlApi;
+
+    // Pasa a true cuando la API ya respondio bien y hay datos para filtrar.
+    let cargado = false;
 
     const MOTIVOS = {
         cena: 'Cena normal',
@@ -107,6 +117,41 @@
         pintarContadores();
     }
 
+    /* ---------- Estados de la solicitud: carga y error ---------- */
+    function mostrarCargando() {
+        contenedor.innerHTML = '<p class="sin-resultados">Cargando reservas...</p>';
+    }
+
+    function mostrarError(error) {
+        console.error('No se pudieron obtener las reservas:', error);
+        if (contadores) contadores.innerHTML = '';
+        contenedor.innerHTML =
+            '<p class="sin-resultados aviso-error">No se pudieron cargar las reservas. ' +
+            'Presiona "Actualizar" para intentar de nuevo.</p>';
+    }
+
+    /* ---------- Consulta a la API (GET) ---------- */
+    function cargar() {
+        cargado = false;
+        mostrarCargando();
+
+        fetch(URL_API)
+            .then(function (response) {
+                // fetch() solo falla por su cuenta si no hay conexion:
+                // un 404 o un 500 llegan como respuesta y hay que revisarlos.
+                if (!response.ok) {
+                    throw new Error('El servidor respondio ' + response.status);
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                ReservasStore.recibir(data.reservas);
+                render();
+                cargado = true;
+            })
+            .catch(mostrarError);
+    }
+
     /* ---------- Eventos ---------- */
     contenedor.addEventListener('click', function (evento) {
         const boton = evento.target.closest('.btn-accion');
@@ -115,8 +160,14 @@
         render();
     });
 
-    if (filtroEstado) filtroEstado.addEventListener('change', render);
-    if (filtroTexto)  filtroTexto.addEventListener('input', render);
+    // Sin datos cargados no hay nada que filtrar (se esta cargando o hubo error).
+    function alFiltrar() {
+        if (cargado) render();
+    }
 
-    render();
+    if (filtroEstado) filtroEstado.addEventListener('change', alFiltrar);
+    if (filtroTexto)  filtroTexto.addEventListener('input', alFiltrar);
+    if (botonActualizar) botonActualizar.addEventListener('click', cargar);
+
+    cargar();
 })();
