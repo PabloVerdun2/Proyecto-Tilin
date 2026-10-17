@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
     login_view,
     logout_view,
@@ -6,7 +6,6 @@ from .views import (
     index_view,
     menu_view,
     reservas_view,
-    reservas_api
 )
 
 urlpatterns = [
@@ -16,5 +15,5 @@ urlpatterns = [
     path('register/', register_view, name='register'),  # Registro de nuevos usuarios
     path('menu/', menu_view, name='menu'),          # Menu del restaurante
     path('reservas/', reservas_view, name='reservas'),  # Listado de reservas
-    path('api/reservas/', reservas_api, name='reservas_api'),  # Reservas en JSON
+    path('api/', include('cuentas.api.urls')),      # API propia en JSON (Indicador 4)
 ]

@@ -1,14 +1,3 @@
-/* ============================================================
-   LISTADO DE RESERVAS
-   ------------------------------------------------------------
-   Interacciones del punto 3.7: mostrar el listado, filtrarlo,
-   cambiar el estado de una reserva y actualizar los contadores,
-   todo sin recargar la pagina.
-
-   Indicador 3: las reservas se piden a la API con fetch() (GET)
-   y la pantalla muestra los estados de carga, exito y error.
-   ============================================================ */
-
 (function () {
     'use strict';
 

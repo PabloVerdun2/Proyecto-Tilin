@@ -32,6 +32,23 @@
     font-weight: bold;
 }
 
+/* Error al enviar el formulario a la API (sin conexion, sesion vencida...). */
+.aviso-envio-error {
+    background-color: #fdf3f2;
+    border-left: 4px solid #c0392b;
+    color: #a5281b;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+/* Boton bloqueado mientras se espera la respuesta del POST. */
+.reserve-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
 /* ===== PANEL DE FILTROS ===== */
 .panel-filtros {
     max-width: 900px;

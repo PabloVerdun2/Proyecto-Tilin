@@ -17,7 +17,11 @@
 
             {# novalidate desactiva los mensajes del navegador para que se vean #}
             {# los nuestros, en español y con el detalle de cada error.         #}
-            <form id="form-reserva" novalidate data-url-reservas="{% url 'reservas' %}">
+            {# data-url-api: endpoint POST propio (Indicador 4). #}
+            <form id="form-reserva" novalidate
+                  data-url-reservas="{% url 'reservas' %}"
+                  data-url-api="{% url 'reservas_api' %}">
+                {% csrf_token %}
                 <div class="form-group">
                     <label for="date">Fecha</label>
                     <input type="date" id="date" name="date">

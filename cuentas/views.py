@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -56,35 +55,6 @@ def menu_view(request):
 def reservas_view(request):
     return render(request, 'cuentas/reservas.html', {'usuario': request.user.first_name})
 
-# Reservas que devuelve la API. El Indicador 3 todavia no exige base de
-# datos, asi que son datos fijos: en la proxima etapa se reemplazan por
-# una consulta al modelo Reserva.
-RESERVAS_EJEMPLO = [
-    {
-        'id': 1, 'nombre': 'Maria Gonzalez', 'correo': 'maria@ejemplo.com',
-        'telefono': '+595981123456', 'fecha': '2026-09-12', 'hora': '20:00',
-        'personas': 4, 'motivo': 'birthday', 'notas': 'Mesa cerca de la ventana',
-        'estado': 'confirmada',
-    },
-    {
-        'id': 2, 'nombre': 'Carlos Benitez', 'correo': 'carlos@ejemplo.com',
-        'telefono': '+595971998877', 'fecha': '2026-09-15', 'hora': '13:30',
-        'personas': 2, 'motivo': 'business', 'notas': '',
-        'estado': 'pendiente',
-    },
-    {
-        'id': 3, 'nombre': 'Lucia Ramirez', 'correo': 'lucia@ejemplo.com',
-        'telefono': '+595983445566', 'fecha': '2026-09-18', 'hora': '21:00',
-        'personas': 6, 'motivo': 'anniversary', 'notas': 'Torta al final',
-        'estado': 'cancelada',
-    },
-]
-
-# API: GET /api/reservas/ (requiere login)
-# Responde JSON con la forma {"reservas": [ {...}, {...} ]}.
-@login_required
-def reservas_api(request):
-    return JsonResponse({'reservas': RESERVAS_EJEMPLO})
 
 # LOGOUT
 def logout_view(request):

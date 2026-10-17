@@ -4,6 +4,9 @@
    Validaciones exigidas por el Indicador 2 (punto 3.5):
    obligatorios, formato de correo, valores numericos, fechas
    validas, longitud minima/maxima y mensajes claros.
+
+   Indicador 4: si los datos son validos se envian por POST a la
+   API propia (/api/reservas/), que vuelve a validarlos.
    ============================================================ */
 
 (function () {
@@ -111,9 +114,6 @@
     }
 
     function mostrarExito(reserva) {
-        const previo = document.getElementById('aviso-exito');
-        if (previo) previo.remove();
-
         const aviso = document.createElement('div');
         aviso.id = 'aviso-exito';
         aviso.className = 'aviso-exito';
@@ -127,10 +127,80 @@
         aviso.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    /* ---------- Envio ---------- */
+    function quitarAvisos() {
+        ['aviso-exito', 'aviso-envio-error'].forEach(function (id) {
+            const previo = document.getElementById(id);
+            if (previo) previo.remove();
+        });
+    }
+
+    function mostrarErrorEnvio(mensaje) {
+        const aviso = document.createElement('div');
+        aviso.id = 'aviso-envio-error';
+        aviso.className = 'aviso-envio-error';
+        aviso.textContent = mensaje;
+        form.parentNode.insertBefore(aviso, form);
+        aviso.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    /* ---------- Envio a la API (POST) ---------- */
+    // La API nombra los campos en espanol; el formulario, en ingles.
+    const CAMPO_FORM = {
+        fecha: 'date', hora: 'time', personas: 'guests', motivo: 'occasion',
+        nombre: 'name', correo: 'email', telefono: 'phone', notas: 'notes'
+    };
+
+    const boton = form.querySelector('[type="submit"]');
+
+    function enviar(datos) {
+        boton.disabled = true;
+
+        fetch(form.dataset.urlApi, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Django rechaza un POST sin el token CSRF (403).
+                'X-CSRFToken': form.querySelector('[name="csrfmiddlewaretoken"]').value
+            },
+            body: JSON.stringify(datos)
+        })
+            .then(function (response) {
+                return response.json()
+                    .catch(function () { return {}; })   // Respuesta sin JSON.
+                    .then(function (cuerpo) {
+                        return { status: response.status, cuerpo: cuerpo };
+                    });
+            })
+            .then(function (r) {
+                if (r.status === 201) {
+                    form.reset();
+                    mostrarExito(r.cuerpo.reserva);
+                } else if (r.status === 400 && r.cuerpo.errores) {
+                    // El backend detecto datos invalidos: se marcan los campos.
+                    const errores = {};
+                    Object.keys(r.cuerpo.errores).forEach(function (campo) {
+                        errores[CAMPO_FORM[campo] || campo] = r.cuerpo.errores[campo];
+                    });
+                    mostrarErrores(errores);
+                } else if (r.status === 401 || r.status === 403) {
+                    mostrarErrorEnvio('Tu sesion vencio. Recarga la pagina e inicia sesion de nuevo.');
+                } else {
+                    mostrarErrorEnvio(r.cuerpo.error || ('El servidor respondio ' + r.status + '.'));
+                }
+            })
+            .catch(function (error) {
+                console.error('No se pudo enviar la reserva:', error);
+                mostrarErrorEnvio('No se pudo conectar con el servidor. Intenta de nuevo.');
+            })
+            .finally(function () {
+                boton.disabled = false;
+            });
+    }
+
     form.addEventListener('submit', function (evento) {
-        evento.preventDefault();   // El MVP no envia al servidor todavia.
+        evento.preventDefault();   // El envio lo hace fetch(), sin recargar.
         limpiarErrores();
+        quitarAvisos();
 
         const datos = {
             fecha:    form.querySelector('[name="date"]').value,
@@ -150,9 +220,7 @@
         }
 
         datos.personas = parseInt(datos.personas, 10);
-        const nueva = ReservasStore.agregar(datos);
-        form.reset();
-        mostrarExito(nueva);
+        enviar(datos);
     });
 
     // Al corregir un campo se borra su mensaje de error.
