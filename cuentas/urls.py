@@ -15,5 +15,5 @@ urlpatterns = [
     path('register/', register_view, name='register'),  # Registro de nuevos usuarios
     path('menu/', menu_view, name='menu'),          # Menu del restaurante
     path('reservas/', reservas_view, name='reservas'),  # Listado de reservas
-    path('api/', include('cuentas.api.urls')),      # API propia en JSON (Indicador 4)
+    path('api/', include('cuentas.api.urls')),      # API propia en JSON (persistente)
 ]

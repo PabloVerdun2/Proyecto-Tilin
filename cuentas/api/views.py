@@ -3,17 +3,14 @@ from functools import wraps
 
 from django.http import JsonResponse
 
-from . import almacen
+from ..models import Reserva
 from .validaciones import validar_reserva
 
-# ==============================
-# ENDPOINTS DE RESERVAS
-# ==============================
-#  GET  /api/reservas/        -> 200 listado
-#  POST /api/reservas/        -> 201 reserva creada | 400 datos invalidos
-#  GET  /api/reservas/<id>/   -> 200 una reserva    | 404 no existe
-# Todos requieren sesion iniciada (401 si no la hay). El POST ademas
-# necesita el token CSRF en el encabezado X-CSRFToken.
+# Endpoints de reservas (persisten en la base de datos):
+#   GET  /api/reservas/       -> 200 listado
+#   POST /api/reservas/       -> 201 creada | 400 datos invalidos
+#   GET  /api/reservas/<id>/  -> 200 una reserva | 404 no existe
+# Requieren sesion iniciada (401). El POST necesita el token CSRF.
 
 
 def _error(mensaje, status, **extra):
@@ -26,8 +23,23 @@ def _metodo_no_permitido(permitidos):
     return respuesta
 
 
+def _serializar(reserva):
+    return {
+        'id': reserva.id,
+        'nombre': reserva.nombre_contacto,
+        'correo': reserva.correo,
+        'telefono': reserva.telefono,
+        'fecha': reserva.fecha.isoformat(),
+        'hora': reserva.hora.strftime('%H:%M'),
+        'personas': reserva.cantidad_personas,
+        'motivo': reserva.motivo,
+        'notas': reserva.notas_adicionales,
+        'estado': reserva.estado,
+    }
+
+
 def sesion_requerida(vista):
-    """Como @login_required, pero responde 401 en JSON en vez de redirigir al login."""
+    # Como @login_required, pero responde 401 en JSON en vez de redirigir.
     @wraps(vista)
     def envoltura(request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -36,11 +48,11 @@ def sesion_requerida(vista):
     return envoltura
 
 
-# GET y POST /api/reservas/
 @sesion_requerida
 def reservas(request):
     if request.method == 'GET':
-        return JsonResponse({'reservas': almacen.listar()})
+        lista = [_serializar(r) for r in Reserva.objects.all()]
+        return JsonResponse({'reservas': lista})
     if request.method == 'POST':
         return _crear_reserva(request)
     return _metodo_no_permitido(['GET', 'POST'])
@@ -59,17 +71,27 @@ def _crear_reserva(request):
     if errores:
         return _error('Datos invalidos.', 400, errores=errores)
 
-    nueva = almacen.crear(limpio)
-    return JsonResponse({'reserva': nueva}, status=201)
+    # CREATE: guarda en la BD, asociada al usuario autenticado.
+    reserva = Reserva.objects.create(
+        cliente=request.user,
+        nombre_contacto=limpio['nombre'],
+        correo=limpio['correo'],
+        telefono=limpio['telefono'],
+        fecha=limpio['fecha'],
+        hora=limpio['hora'],
+        cantidad_personas=limpio['personas'],
+        motivo=limpio['motivo'],
+        notas_adicionales=limpio['notas'],
+    )
+    return JsonResponse({'reserva': _serializar(reserva)}, status=201)
 
 
-# GET /api/reservas/<id>/
 @sesion_requerida
 def reserva_detalle(request, reserva_id):
     if request.method != 'GET':
         return _metodo_no_permitido(['GET'])
 
-    reserva = almacen.obtener(reserva_id)
+    reserva = Reserva.objects.filter(pk=reserva_id).first()
     if reserva is None:
         return _error('No existe la reserva #%d.' % reserva_id, 404)
-    return JsonResponse({'reserva': reserva})
+    return JsonResponse({'reserva': _serializar(reserva)})

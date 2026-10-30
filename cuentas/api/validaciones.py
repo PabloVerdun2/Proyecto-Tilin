@@ -6,33 +6,28 @@ from django.core.validators import validate_email
 
 from ..models import Reserva
 
-# ==============================
-# VALIDACION DEL POST /api/reservas/
-# ==============================
-# Mismas reglas que reserva-form.js: el frontend avisa antes de enviar,
-# pero el backend vuelve a validar porque cualquiera puede llamar a la
-# API sin pasar por el formulario (Postman, curl, consola, etc.).
+# Valida el cuerpo del POST /api/reservas/ antes de guardarlo en la BD.
 
 RE_TELEFONO = re.compile(r'^\+?[0-9\s-]{7,20}$')
 MOTIVOS = [clave for clave, _ in Reserva.OPCIONES_MOTIVO]
 
-# Horario del local: (desde, hasta) segun el dia.
+# Horario del local: (desde, hasta, texto) segun el dia.
 HORARIO_SEMANA = ('12:00', '23:00', 'de 12:00 a 23:00')
 HORARIO_FINDE = ('11:00', '23:59', 'de 11:00 a 00:00')
 
 
 def _texto(datos, campo):
-    """Devuelve el campo como texto sin espacios extremos ('' si falta)."""
+    # Devuelve el campo como texto sin espacios; None si no es texto.
     valor = datos.get(campo)
     if valor is None:
         return ''
     if not isinstance(valor, str):
-        return None   # Tipo invalido: lo reporta quien llama.
+        return None
     return valor.strip()
 
 
 def validar_reserva(datos):
-    """Devuelve (reserva_limpia, errores). Si errores no esta vacio, no se crea."""
+    # Devuelve (limpio, errores). Si errores no esta vacio, no se crea.
     errores = {}
     limpio = {}
 
@@ -72,8 +67,8 @@ def validar_reserva(datos):
     limpio['telefono'] = telefono
 
     # Fecha: obligatoria, formato AAAA-MM-DD, no anterior a hoy.
-    fecha_texto = _texto(datos, 'fecha')
     fecha = None
+    fecha_texto = _texto(datos, 'fecha')
     if not fecha_texto:
         errores['fecha'] = 'La fecha es obligatoria (formato AAAA-MM-DD).'
     else:
@@ -83,30 +78,31 @@ def validar_reserva(datos):
                 errores['fecha'] = 'La fecha no puede ser anterior a hoy.'
         except ValueError:
             errores['fecha'] = 'La fecha debe tener el formato AAAA-MM-DD.'
-    limpio['fecha'] = fecha_texto
+    limpio['fecha'] = fecha
 
     # Hora: obligatoria, formato HH:MM, dentro del horario de ese dia.
+    hora = None
     hora_texto = _texto(datos, 'hora')
     if not hora_texto:
         errores['hora'] = 'La hora es obligatoria (formato HH:MM).'
     else:
         try:
-            hora_texto = datetime.strptime(hora_texto, '%H:%M').strftime('%H:%M')
+            hora = datetime.strptime(hora_texto, '%H:%M').time()
+            hhmm = hora.strftime('%H:%M')
             if fecha and 'fecha' not in errores:
                 desde, hasta, texto = HORARIO_FINDE if fecha.weekday() >= 5 else HORARIO_SEMANA
-                if not desde <= hora_texto <= hasta:
+                if not desde <= hhmm <= hasta:
                     errores['hora'] = 'Ese dia atendemos ' + texto + '.'
         except ValueError:
             errores['hora'] = 'La hora debe tener el formato HH:MM.'
-    limpio['hora'] = hora_texto
+    limpio['hora'] = hora
 
-    # Personas: obligatoria, numero entero mayor a cero.
+    # Personas: obligatoria, entero mayor a cero (bool no cuenta).
     personas = datos.get('personas')
     if personas in (None, ''):
         errores['personas'] = 'La cantidad de personas es obligatoria.'
     else:
         try:
-            # bool es subclase de int: true/false no cuentan como numero.
             if isinstance(personas, bool):
                 raise ValueError
             personas = int(personas)
