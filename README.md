@@ -66,7 +66,7 @@ python manage.py migrate
 python manage.py createsuperuser
 ```
 
-> Referencia del esquema generado: [`docs/creacion_tablas.sql`](docs/creacion_tablas.sql).
+> El esquema de la base lo generan las migraciones de Django (carpeta `cuentas/migrations/`).
 
 ## Comandos de arranque
 
