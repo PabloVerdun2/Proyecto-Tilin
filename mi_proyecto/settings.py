@@ -1,18 +1,14 @@
 from pathlib import Path
-import os  # Necesario para manejar rutas
-from decouple import config
+import os
+from decouple import config, Csv
 
 
-# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Clave secreta para Django (mantenela en secreto en producción)
+# Secretos y entorno: se leen del .env (ver .env.example).
 SECRET_KEY = config('SECRET_KEY')
-
-
-# Modo de desarrollo
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = config('DEBUG', default=False, cast=bool)          # produccion: False
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='', cast=Csv())
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
@@ -59,17 +55,22 @@ TEMPLATES = [
 # WSGI
 WSGI_APPLICATION = 'mi_proyecto.wsgi.application'
 
-# 🔧 Configuración de base de datos: SQL Server Express + autenticación de Windows
+# Base de datos: valores por entorno (ver .env.example).
+# Local: SQL Server + autenticacion de Windows (trusted_connection).
+# Produccion: definir DB_USER/DB_PASSWORD y DB_TRUSTED_CONNECTION=no.
+_db_options = {'driver': config('DB_DRIVER', default='ODBC Driver 17 for SQL Server')}
+if config('DB_TRUSTED_CONNECTION', default='yes').lower() == 'yes':
+    _db_options['trusted_connection'] = 'yes'
+
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',
-        'NAME': 'GourmetDB',
-        'HOST': 'localhost\\SQLEXPRESS',
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 17 for SQL Server',
-            'trusted_connection': 'yes',
-        },
+        'ENGINE': config('DB_ENGINE', default='mssql'),
+        'NAME': config('DB_NAME', default='GourmetDB'),
+        'HOST': config('DB_HOST', default='localhost\\SQLEXPRESS'),
+        'PORT': config('DB_PORT', default=''),
+        'USER': config('DB_USER', default=''),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'OPTIONS': _db_options,
     }
 }
 
